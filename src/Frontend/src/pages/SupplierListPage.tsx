@@ -7,10 +7,9 @@ import {
   TableHead,
   TableRow,
   Typography,
-  styled,
-  tableCellClasses,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { StyledTableHeadCell } from "./components/StyledTablleHeadCell";
 
 interface SupplierListQuery {
   id: number;
@@ -67,10 +66,3 @@ export default function SupplierListPage() {
     </>
   );
 }
-
-const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.common.white,
-  },
-}));
