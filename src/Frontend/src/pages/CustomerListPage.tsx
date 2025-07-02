@@ -14,15 +14,20 @@ import {
 } from "@mui/material";
 import { StyledTableHeadCell } from "./components/StyledTablleHeadCell";
 
+interface CustomerCategory {
+  code: string;
+  description: string;
+}
+
+
 interface CustomerListQuery {
-  Id: number;
-  Name: string;
-  Address: string;
-  Email: string;
-  Phone: string;
-  Iban: string;
-  Code: string;
-  Description: string;
+  id: number;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  iban: string;
+  category?: CustomerCategory;
 }
 
 export default function CustomerListPage() {
@@ -42,8 +47,8 @@ export default function CustomerListPage() {
     { key: "email", label: "Email" },
     { key: "phone", label: "Phone" },
     { key: "iban", label: "IBAN" },
-    { key: "code", label: "Code" },
-    { key: "description", label: "Description" },
+    { key: "category.code", label: "Code" },
+    { key: "category.description", label: "Description" },
   ];
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -84,6 +89,9 @@ export default function CustomerListPage() {
     console.log(filterInputs);
   }, [filterInputs.emailFilter, filterInputs.nameFilter]);
 
+function getNestedValue<T>(obj: T, path: string): string {
+  return path.split(".").reduce<any>((acc, part) => acc?.[part], obj) ?? "";
+}
   return (
     <>
       <Typography variant="h4" sx={{ textAlign: "center", mt: 4, mb: 4 }}>
@@ -139,7 +147,7 @@ export default function CustomerListPage() {
               >
                 {tableColumns.map((column) => (
                   <TableCell key={column.key}>
-                    {row[column.key as keyof CustomerListQuery]}
+                    {getNestedValue(row, column.key)}
                   </TableCell>
                 ))}
               </TableRow>

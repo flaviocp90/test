@@ -1,6 +1,6 @@
 namespace Backend.Features.Customers;
 
-public class CustomersListQuery: IRequest<List<CustomersListQueryResponse>>
+public class CustomersListQuery : IRequest<List<CustomersListQueryResponse>>
 {
     public string? Name { get; set; }
     public string? Email { get; set; }
@@ -14,9 +14,13 @@ public class CustomersListQueryResponse
     public string Email { get; set; } = "";
     public string Phone { get; set; } = "";
     public string Iban { get; set; } = "";
+    public CustomersListQueryResponseCategory? Category { get; set; }
+}
+
+public class CustomersListQueryResponseCategory
+{
     public string Code { get; set; } = "";
     public string Description { get; set; } = "";
-
 }
 
 internal class CustomerListQueryHandler(BackendContext context) : IRequestHandler<CustomersListQuery, List<CustomersListQueryResponse>>
@@ -45,8 +49,13 @@ internal class CustomerListQueryHandler(BackendContext context) : IRequestHandle
             Email = c.Email,
             Phone = c.Phone,
             Iban = c.Iban,
-            Code = c.CustomerCategory != null ? c.CustomerCategory.Code : "",
-            Description = c.CustomerCategory != null ? c.CustomerCategory.Description : ""
+            Category = c.CustomerCategory != null
+                  ? new CustomersListQueryResponseCategory
+                  {
+                      Code = c.CustomerCategory.Code,
+                      Description = c.CustomerCategory.Description
+                  }
+                  : null
         }).ToListAsync(cancellationToken);
     }
 }
