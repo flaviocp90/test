@@ -9,7 +9,8 @@ import {
   TableBody,
   TableCell,
   TableFooter,
-  TablePagination
+  TablePagination,
+  TextField,
 } from "@mui/material";
 import { StyledTableHeadCell } from "./components/StyledTablleHeadCell";
 
@@ -29,6 +30,10 @@ export default function CustomerListPage() {
   const [paginationOptions, setPaginationOptions] = useState({
     page: 0,
     rowsPerPage: 10,
+  });
+  const [filterInputs, setFilterInputs] = useState({
+    nameFilter: "",
+    emailFilter: "",
   });
 
   const tableColumns = [
@@ -64,14 +69,20 @@ export default function CustomerListPage() {
   );
 
   useEffect(() => {
-    fetch("/api/customers/list")
+    const query = new URLSearchParams();
+    if (filterInputs.nameFilter) query.append("name", filterInputs.nameFilter);
+    if (filterInputs.emailFilter)
+      query.append("email", filterInputs.emailFilter);
+    
+     fetch(`/api/customers/list?${query.toString()}`)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         setDataList(data as CustomerListQuery[]);
       });
-  }, []);
+    console.log(filterInputs);
+  }, [filterInputs.emailFilter, filterInputs.nameFilter]);
 
   return (
     <>
@@ -86,6 +97,37 @@ export default function CustomerListPage() {
                 <StyledTableHeadCell key={column.key}>
                   {column.label}
                 </StyledTableHeadCell>
+              ))}
+            </TableRow>
+            <TableRow>
+              {tableColumns.map((column) => (
+                <TableCell key={column.key}>
+                  {["name", "email"].includes(column.key) ? (
+                    <TextField
+                      variant="standard"
+                      placeholder={`Filter ${column.label}`}
+                      value={
+                        column.key === "name"
+                          ? filterInputs.nameFilter
+                          : filterInputs.emailFilter
+                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (column.key === "name")
+                          setFilterInputs((prev) => ({
+                            ...prev,
+                            nameFilter: value,
+                          }));
+                        if (column.key === "email")
+                          setFilterInputs((prev) => ({
+                            ...prev,
+                            emailFilter: value,
+                          }));
+                      }}
+                      fullWidth
+                    />
+                  ) : null}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
